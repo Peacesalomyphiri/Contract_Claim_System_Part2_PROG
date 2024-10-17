@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq; // Import this for using Linq
+using System.Linq; 
 using System.Threading.Tasks;
 using Contract_Claim_System.Models;
 using Contract_Claim_System.ViewModels;
@@ -118,7 +118,7 @@ namespace Contract_Claim_System.Controllers
             if (ModelState.IsValid)
             {
                 var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-                Directory.CreateDirectory(uploadDir); // Create the directory if it doesn't exist
+                Directory.CreateDirectory(uploadDir); 
 
                 if (model.SupportingDocument != null && model.SupportingDocument.Length > 0)
                 {
