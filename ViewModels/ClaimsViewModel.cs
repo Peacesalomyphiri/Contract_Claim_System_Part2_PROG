@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http; // Ensure this using directive is included
+﻿using Microsoft.AspNetCore.Http; 
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,19 +20,19 @@ namespace Contract_Claim_System.ViewModels
         public int HoursWorked { get; set; }
 
         [Required(ErrorMessage = "Submission Date is required.")]
-        public DateTime SubmissionDate { get; set; } = DateTime.Now; // Set a default value
+        public DateTime SubmissionDate { get; set; } = DateTime.Now; 
 
         [Required(ErrorMessage = "Supporting Document is required.")]
         public IFormFile SupportingDocument { get; set; }
 
         public string SupportingDocumentPath { get; set; } = string.Empty;
 
-        public string SupportingDocumentName { get; set; } = string.Empty; // Add this property for the document name
+        public string SupportingDocumentName { get; set; } = string.Empty; 
 
         public string AdditionalNotes { get; set; } = string.Empty;
 
         public decimal TotalAmount { get; set; }
 
-        public string Status { get; set; } = "Pending"; // Default status
+        public string Status { get; set; } = "Pending";
     }
 }

@@ -18,7 +18,7 @@
                 <th>Supporting Document</th>
                 <th>Total Amount</th>
                 <th>Status</th>
-                <th>Additional Notes</th> <!-- New column for Additional Notes -->
+                <th>Additional Notes</th> 
                 <th>Actions</th>
             </tr>
         </thead>
@@ -42,7 +42,7 @@
                         </td>
                         <td>@claim.TotalAmount.ToString("C")</td>
                         <td>@claim.Status</td>
-                        <td>@claim.AdditionalNotes</td> <!-- Display Additional Notes -->
+                        <td>@claim.AdditionalNotes</td> 
                         <td>
                             <form asp-action="ApproveClaim" method="post" style="display:inline;">
                                 <input type="hidden" name="index" value="@i" />
@@ -59,7 +59,7 @@
             else
             {
                 <tr>
-                    <td colspan="9">No claims submitted yet.</td> <!-- Adjust colspan for new column -->
+                    <td colspan="9">No claims submitted yet.</td> 
                 </tr>
             }
         </tbody>

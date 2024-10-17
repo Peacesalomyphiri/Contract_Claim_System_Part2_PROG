@@ -163,7 +163,7 @@ namespace Contract_Claim_System.Controllers
                 // Create a new claim
                 var claim = new ClaimsViewModel
                 {
-                    ClaimID = _claimCounter++, // Ensure this property exists in ClaimsViewModel
+                    ClaimID = _claimCounter++, 
                     LecturerName = _httpContextAccessor.HttpContext.Session.GetString("Username") ?? "Unknown Lecturer",
                     HourlyRate = model.HourlyRate,
                     HoursWorked = model.HoursWorked,

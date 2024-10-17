@@ -9,23 +9,23 @@ namespace Contract_Claim_System
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+           
             builder.Services.AddControllersWithViews();
 
-            // Enable session state management
+         
             builder.Services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
-                options.Cookie.HttpOnly = true; // Security: Session cookies can only be accessed by the server
-                options.Cookie.IsEssential = true; // Mark the session cookie as essential
+                options.IdleTimeout = TimeSpan.FromMinutes(30); 
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true; 
             });
 
-            // Register IHttpContextAccessor
-            builder.Services.AddHttpContextAccessor(); // Add this line
+           
+            builder.Services.AddHttpContextAccessor(); 
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+       
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -37,8 +37,8 @@ namespace Contract_Claim_System
 
             app.UseRouting();
 
-            app.UseSession(); // Add session middleware here
-            app.UseAuthorization(); // Ensure session is available before authorization
+            app.UseSession(); 
+            app.UseAuthorization(); 
 
             app.MapControllerRoute(
                 name: "default",
