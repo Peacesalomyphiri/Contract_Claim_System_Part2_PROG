@@ -128,7 +128,7 @@ namespace Contract_Claim_System.Controllers
                         await model.SupportingDocument.CopyToAsync(stream);
                     }
 
-                    // Calculate total amount
+                    // This Calculates total amount depending on the hours Worked as well as the rate
                     model.TotalAmount = model.HourlyRate * model.HoursWorked;
 
                     // Create a new claim and set its properties
