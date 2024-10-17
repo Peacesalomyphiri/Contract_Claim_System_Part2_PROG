@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Contract_Claim_System.ViewModels.ClaimsViewModel>
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="dashboard">
+    <h2>Lecturer Dashboard</h2>
+
+    <form asp-action="SubmitClaim" method="post">
+        <button type="submit" class="btn btn-primary">Submit a New Claim</button>
+    </form>
+
+    <table class="claims-table">
+        <thead>
+            <tr>
+                <th>Lecturer Name</th>
+                <th>Hourly Rate</th>
+                <th>Hours Worked</th>
+                <th>Submission Date</th>
+                <th>Supporting Document</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var claim in Model)
+                {
+                    <tr>
+                        <td>@claim.LecturerName</td>
+                        <td>@claim.HourlyRate.ToString("C")</td>
+                        <td>@claim.HoursWorked</td>
+                        <td>@claim.SubmissionDate.ToShortDateString()</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(claim.SupportingDocumentPath))
+                            {
+                                <a href="@claim.SupportingDocumentPath" target="_blank">@claim.SupportingDocumentName</a>
+                            }
+                        </td>
+                        <td>@claim.TotalAmount.ToString("C")</td>
+                        <td>@claim.Status</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7">No claims submitted yet.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

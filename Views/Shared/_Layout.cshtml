@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "Contract Claim System";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css" /> <!-- Adjust your CSS path as needed -->
+</head>
+<body>
+    <nav class="navbar">
+        <ul class="navbar-list">
+            <li class="navbar-item"><a class="navbar-link" asp-controller="Home" asp-action="Index">Home</a></li>
+
+            @if (Context.Session.GetString("UserRole") == null) // Check if the user is not logged in
+            {
+                <li class="navbar-item"><a class="navbar-link" asp-controller="Account" asp-action="Login">Account</a></li>
+            }
+            else
+            {
+                <li class="navbar-item">
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken() <!-- Anti-Forgery Token for security -->
+                        <button type="submit" class="navbar-link" style="background:none; border:none; color:inherit; cursor:pointer;">Logout</button>
+                    </form>
+                </li>
+            }
+
+            @if (Context.Session.GetString("UserRole") == "Lecturer")
+            {
+                <li class="navbar-item"><a class="navbar-link" asp-controller="Claims" asp-action="LecturerDashboard">Lecturer Dashboard</a></li>
+            }
+
+            @if (Context.Session.GetString("UserRole") == "Coordinator")
+            {
+                <li class="navbar-item"><a class="navbar-link" asp-controller="Claims" asp-action="CoordinatorDashboard">Coordinator Dashboard</a></li>
+            }
+
+            @if (Context.Session.GetString("UserRole") == "Manager")
+            {
+                <li class="navbar-item"><a class="navbar-link" asp-controller="Claims" asp-action="AcademicManagerDashboard">Academic Manager Dashboard</a></li>
+            }
+        </ul>
+    </nav>
+
+    <div class="container">
+        @RenderBody() <!-- This is where your view content will be injected -->
+    </div>
+    <footer>
+        <p>&copy; 2024 Contract Claim System</p>
+    </footer>
+</body>
+</html>

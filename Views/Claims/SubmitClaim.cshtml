@@ -1,0 +1,37 @@
+﻿@model Contract_Claim_System.ViewModels.ClaimsViewModel
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="form-container">
+    <h2>Submit a New Claim</h2>
+
+    <form asp-action="SubmitClaim" enctype="multipart/form-data" method="post" class="claim-form">
+        <div class="form-group">
+            <label for="LecturerName">Lecturer Name:</label>
+            <input type="text" name="LecturerName" required class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="HourlyRate">Hourly Rate:</label>
+            <input type="number" name="HourlyRate" required class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="HoursWorked">Hours Worked:</label>
+            <input type="number" name="HoursWorked" required class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="SubmissionDate">Submission Date:</label>
+            <input type="date" name="SubmissionDate" required class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="SupportingDocument">Supporting Document:</label>
+            <input type="file" name="SupportingDocument" required class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="AdditionalNotes">Additional Notes:</label>
+            <textarea name="AdditionalNotes" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Claim</button>
+    </form>
+</div>

@@ -1,0 +1,37 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Contract Monthly Claim System</h2>
+        <form method="post" action="/Account/Login" class="login-form">
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" name="Username" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" name="Password" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Select Role:</label>
+                <select name="Role" class="form-control">
+                    <option value="Lecturer">Lecturer</option>
+                    <option value="Coordinator">Program Coordinator</option>
+                    <option value="Manager">Academic Manager</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+</body>
+</html>

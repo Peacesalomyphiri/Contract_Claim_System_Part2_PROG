@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Contract_Claim_System.ViewModels.ClaimsViewModel>
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="dashboard">
+    <h2>Coordinator Dashboard</h2>
+
+    <table class="claims-table">
+        <thead>
+            <tr>
+                <th>Lecturer Name</th>
+                <th>Hourly Rate</th>
+                <th>Hours Worked</th>
+                <th>Submission Date</th>
+                <th>Supporting Document</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                for (int i = 0; i < Model.Count(); i++)
+                {
+                    var claim = Model.ElementAt(i);
+                    <tr>
+                        <td>@claim.LecturerName</td>
+                        <td>@claim.HourlyRate.ToString("C")</td>
+                        <td>@claim.HoursWorked</td>
+                        <td>@claim.SubmissionDate.ToShortDateString()</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(claim.SupportingDocumentPath))
+                            {
+                                <a href="@claim.SupportingDocumentPath" target="_blank">@claim.SupportingDocumentName</a>
+                            }
+                        </td>
+                        <td>@claim.TotalAmount.ToString("C")</td>
+                        <td>@claim.Status</td>
+                        <td>
+                            <form asp-action="ApproveClaim" method="post" style="display:inline;">
+                                <input type="hidden" name="index" value="@i" />
+                                <button type="submit" class="btn btn-success">Approve</button>
+                            </form>
+                            <form asp-action="RejectClaim" method="post" style="display:inline;">
+                                <input type="hidden" name="index" value="@i" />
+                                <button type="submit" class="btn btn-danger">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8">No claims submitted yet.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
