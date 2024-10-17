@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Contract_Claim_System.Models;
 using Contract_Claim_System.ViewModels;
-
+ 
 namespace Contract_Claim_System.Controllers
 {
     public class ClaimsController : Controller
