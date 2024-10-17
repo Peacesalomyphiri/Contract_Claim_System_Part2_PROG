@@ -7,6 +7,12 @@
 <div class="dashboard">
     <h2>Lecturer Dashboard</h2>
 
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <div class="alert alert-success">
+            @ViewBag.SuccessMessage
+        </div>
+    }
     <form asp-action="SubmitClaim" method="post">
         <button type="submit" class="btn btn-primary">Submit a New Claim</button>
     </form>
@@ -14,6 +20,7 @@
     <table class="claims-table">
         <thead>
             <tr>
+                <th>ClaimID</th>
                 <th>Lecturer Name</th>
                 <th>Hourly Rate</th>
                 <th>Hours Worked</th>
@@ -21,14 +28,18 @@
                 <th>Supporting Document</th>
                 <th>Total Amount</th>
                 <th>Status</th>
+                <th>Additional Notes</th> 
+                
             </tr>
         </thead>
         <tbody>
             @if (Model != null && Model.Any())
             {
-                foreach (var claim in Model)
+                for (int i = 0; i < Model.Count(); i++)
                 {
+                    var claim = Model.ElementAt(i);
                     <tr>
+                        <td>@claim.ClaimID</td>
                         <td>@claim.LecturerName</td>
                         <td>@claim.HourlyRate.ToString("C")</td>
                         <td>@claim.HoursWorked</td>
@@ -41,13 +52,15 @@
                         </td>
                         <td>@claim.TotalAmount.ToString("C")</td>
                         <td>@claim.Status</td>
+                        <td>@claim.AdditionalNotes</td> 
+                       
                     </tr>
                 }
             }
             else
             {
                 <tr>
-                    <td colspan="7">No claims submitted yet.</td>
+                    <td colspan="10">No claims submitted yet.</td> 
                 </tr>
             }
         </tbody>

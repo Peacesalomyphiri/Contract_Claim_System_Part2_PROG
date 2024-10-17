@@ -1,12 +1,18 @@
-﻿using Contract_Claim_System.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace Contract_Claim_System.Models
 {
     public class User
     {
         public int UserId { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Role { get; set; }  // e.g., Lecturer, Coordinator, Manager
+
+        [Required(ErrorMessage = "Username is required.")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required.")]
+        public string Password { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Role is required.")]
+        public string Role { get; set; } = string.Empty;  // e.g., Lecturer, Coordinator, Manager
     }
 }
-

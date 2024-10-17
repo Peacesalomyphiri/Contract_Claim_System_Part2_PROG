@@ -20,6 +20,9 @@ namespace Contract_Claim_System
                 options.Cookie.IsEssential = true; // Mark the session cookie as essential
             });
 
+            // Register IHttpContextAccessor
+            builder.Services.AddHttpContextAccessor(); // Add this line
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -34,8 +37,8 @@ namespace Contract_Claim_System
 
             app.UseRouting();
 
-            app.UseAuthorization();
             app.UseSession(); // Add session middleware here
+            app.UseAuthorization(); // Ensure session is available before authorization
 
             app.MapControllerRoute(
                 name: "default",

@@ -2,7 +2,7 @@
 
 @{
     Layout = "_Layout";
-} 
+}
 
 <div class="dashboard">
     <h2>Academic Manager Dashboard</h2>
@@ -10,6 +10,7 @@
     <table class="claims-table">
         <thead>
             <tr>
+                <th>ClaimID</th>
                 <th>Lecturer Name</th>
                 <th>Hourly Rate</th>
                 <th>Hours Worked</th>
@@ -17,6 +18,7 @@
                 <th>Supporting Document</th>
                 <th>Total Amount</th>
                 <th>Status</th>
+                <th>Additional Notes</th> <!-- New column for Additional Notes -->
                 <th>Actions</th>
             </tr>
         </thead>
@@ -27,6 +29,7 @@
                 {
                     var claim = Model.ElementAt(i);
                     <tr>
+                        <td>@claim.ClaimID</td>
                         <td>@claim.LecturerName</td>
                         <td>@claim.HourlyRate.ToString("C")</td>
                         <td>@claim.HoursWorked</td>
@@ -39,6 +42,7 @@
                         </td>
                         <td>@claim.TotalAmount.ToString("C")</td>
                         <td>@claim.Status</td>
+                        <td>@claim.AdditionalNotes</td> <!-- Display Additional Notes -->
                         <td>
                             <form asp-action="ApproveClaim" method="post" style="display:inline;">
                                 <input type="hidden" name="index" value="@i" />
@@ -55,7 +59,7 @@
             else
             {
                 <tr>
-                    <td colspan="8">No claims submitted yet.</td>
+                    <td colspan="9">No claims submitted yet.</td> <!-- Adjust colspan for new column -->
                 </tr>
             }
         </tbody>

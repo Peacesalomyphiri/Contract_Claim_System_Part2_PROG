@@ -13,7 +13,16 @@
 <body>
     <div class="login-container">
         <h2>Login to Contract Monthly Claim System</h2>
-        <form method="post" action="/Account/Login" class="login-form">
+
+        @* Display error message if login fails *@
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <div class="alert alert-danger" style="color: red; font-size: 10px; margin-top: 5px;">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+
+        <form method="post" asp-controller="Account" asp-action="Login" class="login-form">
             <div class="form-group">
                 <label>Username:</label>
                 <input type="text" name="Username" class="form-control" required />
@@ -24,7 +33,7 @@
             </div>
             <div class="form-group">
                 <label>Select Role:</label>
-                <select name="Role" class="form-control">
+                <select name="Role" class="form-control" required>
                     <option value="Lecturer">Lecturer</option>
                     <option value="Coordinator">Program Coordinator</option>
                     <option value="Manager">Academic Manager</option>

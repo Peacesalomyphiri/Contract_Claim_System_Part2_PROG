@@ -8,14 +8,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/site.css" /> <!-- Adjust your CSS path as needed -->
+    <link rel="stylesheet" href="~/css/site.css" /> 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
 </head>
 <body>
     <nav class="navbar">
         <ul class="navbar-list">
             <li class="navbar-item"><a class="navbar-link" asp-controller="Home" asp-action="Index">Home</a></li>
 
-            @if (Context.Session.GetString("UserRole") == null) // Check if the user is not logged in
+            @if (Context.Session.GetString("UserRole") == null) // Checks if the user is not logged in
             {
                 <li class="navbar-item"><a class="navbar-link" asp-controller="Account" asp-action="Login">Account</a></li>
             }
@@ -49,6 +53,7 @@
     <div class="container">
         @RenderBody() <!-- This is where your view content will be injected -->
     </div>
+    @RenderSection("Scripts", required: false)
     <footer>
         <p>&copy; 2024 Contract Claim System</p>
     </footer>

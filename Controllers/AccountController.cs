@@ -14,11 +14,11 @@ namespace Contract_Claim_System.Controllers
         [HttpPost]
         public IActionResult Login(string Username, string Password, string Role)
         {
-            
             if (IsValidUser(Username, Password, Role))
             {
-                // Store role in session 
+                // Store role and username in session 
                 HttpContext.Session.SetString("UserRole", Role);
+                HttpContext.Session.SetString("Username", Username);  // Store username in session
 
                 // Redirect based on role
                 if (Role == "Lecturer")
@@ -36,15 +36,14 @@ namespace Contract_Claim_System.Controllers
 
         private bool IsValidUser(string username, string password, string role)
         {
-            // Here you can implement your actual validation logic
-            // This is just a dummy check for demonstration
+            // Dummy user validation logic for demonstration
             return (username == "Peace" && password == "Peace@123" && role == "Lecturer") ||
                    (username == "Yanama" && password == "Yanama@123" && role == "Coordinator") ||
                    (username == "Tarce" && password == "Tarce@123" && role == "Manager");
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // Add this attribute
+        [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
             // Clear the session
