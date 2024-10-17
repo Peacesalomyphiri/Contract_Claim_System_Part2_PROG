@@ -17,7 +17,7 @@ namespace Contract_Claim_System.Controllers
             
             if (IsValidUser(Username, Password, Role))
             {
-                // Store role in session
+                // Store role in session 
                 HttpContext.Session.SetString("UserRole", Role);
 
                 // Redirect based on role
