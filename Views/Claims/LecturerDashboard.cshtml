@@ -28,8 +28,8 @@
                 <th>Supporting Document</th>
                 <th>Total Amount</th>
                 <th>Status</th>
-                <th>Additional Notes</th> 
-                
+                <th>Additional Notes</th>
+                <th>Rejection Reason</th> <!-- New column for Rejection Reason -->
             </tr>
         </thead>
         <tbody>
@@ -52,15 +52,26 @@
                         </td>
                         <td>@claim.TotalAmount.ToString("C")</td>
                         <td>@claim.Status</td>
-                        <td>@claim.AdditionalNotes</td> 
-                       
+                        <td>@claim.AdditionalNotes</td>
+                     
+                            @if (claim.Status == "Rejected")
+                            {
+                            <td>
+                                <p>@claim.RejectionReason</p>
+                            </td>
+                            }
+                            else
+                            {
+                            <td>-</td> <!-- You can leave this empty or put any placeholder like "-" if it's not rejected -->
+                            }
+                        
                     </tr>
                 }
             }
             else
             {
                 <tr>
-                    <td colspan="10">No claims submitted yet.</td> 
+                    <td colspan="10">No claims submitted yet.</td> <!-- Adjusted colspan for new column -->
                 </tr>
             }
         </tbody>

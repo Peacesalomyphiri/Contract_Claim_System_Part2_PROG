@@ -18,7 +18,7 @@
                 <th>Supporting Document</th>
                 <th>Total Amount</th>
                 <th>Status</th>
-                <th>Additional Notes</th> 
+                <th>Additional Notes</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -42,14 +42,18 @@
                         </td>
                         <td>@claim.TotalAmount.ToString("C")</td>
                         <td>@claim.Status</td>
-                        <td>@claim.AdditionalNotes</td> 
+                        <td>@claim.AdditionalNotes</td>
                         <td>
+                            <!-- Approve Claim Form -->
                             <form asp-action="ApproveClaim" method="post" style="display:inline;">
                                 <input type="hidden" name="index" value="@i" />
                                 <button type="submit" class="btn btn-success">Approve</button>
                             </form>
+
+                            <!-- Reject Claim Form with Rejection Reason -->
                             <form asp-action="RejectClaim" method="post" style="display:inline;">
                                 <input type="hidden" name="index" value="@i" />
+                                <textarea name="rejectionReason" placeholder="Enter reason for rejection" required></textarea>
                                 <button type="submit" class="btn btn-danger">Reject</button>
                             </form>
                         </td>
@@ -59,9 +63,19 @@
             else
             {
                 <tr>
-                    <td colspan="9">No claims submitted yet.</td> 
+                    <td colspan="10">No claims submitted yet.</td>
                 </tr>
             }
         </tbody>
     </table>
+
+    <!-- Button to Generate Approved Claims Report -->
+    <form method="get" action="@Url.Action("GenerateReport", "Claims")">
+        <button type="submit" class="btn btn-primary">Generate Approved Claims Report</button>
+    </form>
+
+    <!-- Button to Download Approved Claims Report -->
+    <form method="get" action="@Url.Action("DownloadReport", "Claims")">
+        <button type="submit" class="btn btn-secondary" style="margin-top: 10px;">Download Approved Claims Report</button>
+    </form>
 </div>

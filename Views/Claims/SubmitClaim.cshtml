@@ -28,8 +28,8 @@
         </div>
         <div class="form-group">
             <label asp-for="SubmissionDate">Submission Date:</label>
-            <input type="date" asp-for="SubmissionDate" required class="form-control" />
-            <span asp-validation-for="SubmissionDate" style="color: red; font-size: 10px; margin-top: 5px;"></span>
+            <input type="date" asp-for="SubmissionDate" class="form-control" required />
+            <span asp-validation-for="SubmissionDate" style="color: red;"></span>  <!-- Display validation error here -->
         </div>
         <div class="form-group">
             <label asp-for="SupportingDocument">Supporting Document:</label>
@@ -40,6 +40,28 @@
             <label asp-for="AdditionalNotes">Additional Notes:</label>
             <textarea asp-for="AdditionalNotes" class="form-control"></textarea>
         </div>
+
+        <!-- Total Payment Section -->
+        <div class="form-group">
+            <label>Total Payment:</label>
+            <span id="totalPayment" class="form-control" readonly>R0.00</span>
+        </div>
+
         <button type="submit" class="btn btn-primary">Submit Claim</button>
     </form>
 </div>
+
+<script>
+    // Attach an event listener to input changes
+    document.addEventListener('input', function () {
+        // Get the values of HourlyRate and HoursWorked
+        var hourlyRate = parseFloat(document.querySelector('input[name="HourlyRate"]').value) || 0;
+        var hoursWorked = parseFloat(document.querySelector('input[name="HoursWorked"]').value) || 0;
+
+        // Calculate the total payment
+        var totalPayment = hourlyRate * hoursWorked;
+
+        // Update the total payment in the HTML element with id 'totalPayment'
+        document.getElementById('totalPayment').innerText = 'R' + totalPayment.toFixed(2);
+    });
+</script>

@@ -1,49 +1,34 @@
-﻿@{
-    ViewData["Title"] = "Contract Claim System";
+﻿@model List<Contract_Claim_System.Models.User>
+
+<h2>Users List</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No users found.</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Username</td>
+                    <td>@user.Role</td>
+                    <td>
+                        <!-- You can add action buttons like Edit, Delete, etc. -->
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/site.css" /> 
-</head>
-<body>
-  
-    <div class="container">
-        <div class="homepage-content">
-            <h1>Welcome to the Contract Claim System</h1>
-            <p>
-                The Contract Claim System is designed to streamline the claim submission process for lecturers,
-                program coordinators, and academic managers. Our goal is to simplify the management of claims,
-                ensuring transparency and efficiency.
-            </p>
-
-            <h2>Key Features</h2>
-            <ul>
-                <li>
-                    <strong>Submit Claims:</strong> Lecturers can easily submit claims for reimbursement of their
-                    teaching hours and related expenses.
-                </li>
-                <li>
-                    <strong>Review Claims:</strong> Program coordinators can review and approve claims submitted by
-                    lecturers, ensuring that all submissions meet institutional guidelines.
-                </li>
-                <li>
-                    <strong>Manage Claims:</strong> Academic managers just like Program coordinators, can review and approve claims submitted by
-                    lecturers, ensuring that all submissions meet institutional guidelines.
-                </li>
-            </ul>
-
-            <h2>Getting Started</h2>
-            <p>
-                To begin using the system, please <a asp-controller="Account" asp-action="Login">Login</a>.
-            </p>
-
-           
-        </div>
-    </div>
-</body>
-</html>
+<a href="@Url.Action("AddUser")">Add New User</a>

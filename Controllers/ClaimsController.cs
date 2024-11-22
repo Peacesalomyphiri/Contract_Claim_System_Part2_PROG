@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.IO;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using System.Linq;
 using System.Threading.Tasks;
 using Contract_Claim_System.Models;
@@ -11,9 +13,8 @@ namespace Contract_Claim_System.Controllers
 {
     public class ClaimsController : Controller
     {
-        // Static list to hold claims in memory
         private static List<ClaimsViewModel> _claims = new List<ClaimsViewModel>();
-        private static int _claimCounter = 1; // Class-level static variable
+        private static int _claimCounter = 1; // Unique claim ID counter
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public ClaimsController(IHttpContextAccessor httpContextAccessor)
@@ -21,122 +22,92 @@ namespace Contract_Claim_System.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        // File size limit (5 MB)
-        private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
-        // Allowed file types
+        private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB file size limit
         private static readonly string[] AllowedExtensions = { ".pdf", ".docx", ".xlsx" };
+
+        private const int MaxHoursWorked = 40; // Automation criteria: Maximum hours
+        private const decimal MaxHourlyRate = 100m; // Automation criteria: Maximum hourly rate
 
         private IActionResult CheckUserRole(string[] validRoles)
         {
             var userRole = _httpContextAccessor.HttpContext.Session.GetString("UserRole");
             if (!validRoles.Contains(userRole))
             {
-                return RedirectToAction("Login", "Account"); // Redirect to login if the role doesn't match
+                return RedirectToAction("Login", "Account");
             }
-            return null; // Return null if the user has an expected role
+            return null;
         }
 
         public IActionResult LecturerDashboard()
         {
             var roleCheck = CheckUserRole(new[] { "Lecturer" });
-            if (roleCheck != null)
-            {
-                Console.WriteLine("Role check failed."); // Logging
-                return roleCheck; // Redirect if the user is not a Lecturer
-            }
-            // Retrieve success message from TempData
-            ViewBag.SuccessMessage = TempData["SuccessMessage"];
-            Console.WriteLine("Success message: " + ViewBag.SuccessMessage); // Logging
-            return View(_claims); // Show claims for the lecturer
-        }
+            if (roleCheck != null) return roleCheck;
 
+            ViewBag.SuccessMessage = TempData["SuccessMessage"];
+            return View(_claims);
+        }
 
         public IActionResult CoordinatorDashboard()
         {
             var roleCheck = CheckUserRole(new[] { "Coordinator" });
-            if (roleCheck != null)
+            if (roleCheck != null) return roleCheck;
+
+            // Log or debug output to check claim statuses
+            foreach (var claim in _claims)
             {
-                return roleCheck; // Redirect if the user is not a Coordinator
+                System.Diagnostics.Debug.WriteLine($"Claim ID: {claim.ClaimID}, Status: {claim.Status}");
             }
 
-            return View(_claims); // Show claims for the coordinator
+            return View(_claims.Where(c => c.Status == "Pending Manager Approval").ToList());
+
         }
 
         public IActionResult AcademicManagerDashboard()
         {
             var roleCheck = CheckUserRole(new[] { "Manager" });
-            if (roleCheck != null)
-            {
-                return roleCheck; // Redirect if the user is not an Academic Manager
-            }
+            if (roleCheck != null) return roleCheck;
 
-            return View(_claims); // Show claims for the academic manager
+            return View(_claims.Where(c => c.Status == "Pending Manager Approval").ToList());
         }
 
-        // Approve Claim for Coordinator and Manager
         [HttpPost]
         public IActionResult ApproveClaim(int index)
         {
             var roleCheck = CheckUserRole(new[] { "Coordinator", "Manager" });
-            if (roleCheck != null)
-            {
-                return roleCheck; // Redirect if the user is not authorized
-            }
+            if (roleCheck != null) return roleCheck;
 
             if (index >= 0 && index < _claims.Count)
             {
-                _claims[index].Status = "Approved"; // Update the claim status
+                _claims[index].Status = "Approved";
             }
 
-            // Return the current dashboard view after approval
-            var userRole = _httpContextAccessor.HttpContext.Session.GetString("UserRole");
-            if (userRole == "Coordinator")
-            {
-                return View("CoordinatorDashboard", _claims); // Keep the user on the current page for Coordinator
-            }
-            else
-            {
-                return View("AcademicManagerDashboard", _claims); // Keep the user on the current page for Academic Manager
-            }
+            return RedirectToAction("CoordinatorDashboard");
         }
 
-        // Reject Claim for Coordinator and Manager
         [HttpPost]
-        public IActionResult RejectClaim(int index)
+        public IActionResult RejectClaim(int index, string rejectionReason)
         {
             var roleCheck = CheckUserRole(new[] { "Coordinator", "Manager" });
-            if (roleCheck != null)
-            {
-                return roleCheck; // Redirect if the user is not authorized
-            }
+            if (roleCheck != null) return roleCheck;
 
             if (index >= 0 && index < _claims.Count)
             {
-                _claims[index].Status = "Rejected"; // Update the claim status
+                var claim = _claims[index];
+                claim.Status = "Rejected";
+                claim.RejectionReason = rejectionReason; // Store the rejection reason
             }
 
-            // Return the current dashboard view after rejection
-            var userRole = _httpContextAccessor.HttpContext.Session.GetString("UserRole");
-            if (userRole == "Coordinator")
-            {
-                return View("CoordinatorDashboard", _claims); // Keep the user on the current page for Coordinator
-            }
-            else
-            {
-                return View("AcademicManagerDashboard", _claims); // Keep the user on the current page for Academic Manager
-            }
+            return RedirectToAction("CoordinatorDashboard");
         }
 
-        // Action method to submit claims
         [HttpPost]
         public async Task<IActionResult> SubmitClaim(ClaimsViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // File handling logic
+                // File validation
                 if (model.SupportingDocument != null && model.SupportingDocument.Length > 0)
                 {
-                    // Check file size
                     if (model.SupportingDocument.Length > MaxFileSize)
                     {
                         ModelState.AddModelError("SupportingDocument", "File size exceeds 5 MB limit.");
@@ -144,26 +115,23 @@ namespace Contract_Claim_System.Controllers
                     }
 
                     var fileExtension = Path.GetExtension(model.SupportingDocument.FileName);
-                    // Check file type
                     if (!AllowedExtensions.Contains(fileExtension))
                     {
-                        ModelState.AddModelError("SupportingDocument", "Invalid file type. Allowed types: .pdf, .docx, .xlsx");
+                        ModelState.AddModelError("SupportingDocument", "Invalid file type.");
                         return View(model);
                     }
 
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", model.SupportingDocument.FileName);
-
-                    // Save the file to the server
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await model.SupportingDocument.CopyToAsync(stream);
                     }
                 }
 
-                // Create a new claim
+                // Claim creation
                 var claim = new ClaimsViewModel
                 {
-                    ClaimID = _claimCounter++, 
+                    ClaimID = _claimCounter++,
                     LecturerName = _httpContextAccessor.HttpContext.Session.GetString("Username") ?? "Unknown Lecturer",
                     HourlyRate = model.HourlyRate,
                     HoursWorked = model.HoursWorked,
@@ -171,18 +139,162 @@ namespace Contract_Claim_System.Controllers
                     SupportingDocumentPath = $"/uploads/{model.SupportingDocument.FileName}",
                     SupportingDocumentName = model.SupportingDocument.FileName,
                     AdditionalNotes = model.AdditionalNotes,
-                    TotalAmount = model.HourlyRate * model.HoursWorked, // Calculate total amount
-                    Status = "Pending" // Initial status
+                    TotalAmount = model.HourlyRate * model.HoursWorked,
                 };
 
-                // Add the claim to the static list
-                _claims.Add(claim);
+                // Automation for claim validation
+                if (model.HoursWorked > MaxHoursWorked || model.HourlyRate > MaxHourlyRate)
+                {
+                    claim.Status = "Pending Manager Approval";
+                }
+                else if (string.IsNullOrEmpty(claim.SupportingDocumentPath))
+                {
+                    claim.Status = "Pending Review";
+                }
+                else
+                {
+                    claim.Status = "Approved";
+                }
 
-                TempData["SuccessMessage"] = "Your claim has been submitted successfully."; // Success message
+                // Add claim to the list
+                _claims.Add(claim);
+                TempData["SuccessMessage"] = "Claim submitted successfully.";
                 return RedirectToAction("LecturerDashboard");
             }
 
             return View(model);
         }
+        public void GenerateClaimReport(List<Claim> claims)
+        {
+            // Filter approved claims
+            var approvedClaims = claims.Where(c => c.Status == "Approved").ToList();
+
+            // Create the directory path for the report
+            string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Reports");
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            // Create the file path for the PDF
+            string filePath = Path.Combine(directoryPath, "ApprovedClaimsReport.pdf");
+
+            // Create a document and set up the PDF writer
+            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            {
+                Document document = new Document();
+                PdfWriter writer = PdfWriter.GetInstance(document, fs);
+                document.Open();
+
+                // Add a title to the document
+                document.Add(new Paragraph("Approved Claims Report"));
+                document.Add(new Paragraph($"Generated on: {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\n\n"));
+
+                // Set up the table with the columns
+                PdfPTable table = new PdfPTable(9); // 9 columns for each data point
+                table.WidthPercentage = 100; // Set table width to fill the page
+
+                // Add table headers
+                table.AddCell("ClaimID");
+                table.AddCell("Lecturer Name");
+                table.AddCell("Hourly Rate");
+                table.AddCell("Hours Worked");
+                table.AddCell("Submission Date");
+                table.AddCell("Supporting Document");
+                table.AddCell("Total Amount");
+                table.AddCell("Status");
+                table.AddCell("Additional Notes");
+
+                // Add rows for each approved claim
+                foreach (var claim in approvedClaims)
+                {
+                    string formattedDate = claim.SubmissionDate.ToString("yyyy-MM-dd"); // Adjust the date format as needed
+                    string formattedAmount = claim.TotalAmount.ToString("C"); // Currency formatting (e.g., $100.00)
+
+                    // Check if SupportingDocument has a valid link (assuming it's a file path or URL)
+                    string supportingDocLink = claim.SupportingDocumentName;  // Assuming it contains the URL or path to the file
+
+                    // Add claim data to the table
+                    table.AddCell(claim.ClaimID.ToString());
+                    table.AddCell(claim.LecturerName);
+                    table.AddCell(claim.HourlyRate.ToString("F2")); // Display HourlyRate with two decimal places
+                    table.AddCell(claim.HoursWorked.ToString("F2")); // Display HoursWorked with two decimal places
+                    table.AddCell(formattedDate);
+
+                    // Create a clickable link for the Supporting Document
+                    if (Uri.IsWellFormedUriString(supportingDocLink, UriKind.Absolute))
+                    {
+                        // If it's a valid URL, create a link
+                        Font linkFont = new Font(Font.FontFamily.HELVETICA, 12, Font.UNDERLINE, BaseColor.BLUE);
+                        Anchor link = new Anchor(supportingDocLink, linkFont);
+                        link.Reference = supportingDocLink;  // Set the URL for the link
+                        PdfPCell linkCell = new PdfPCell(link);
+                        linkCell.Border = Rectangle.NO_BORDER;  // Remove border around the link
+                        table.AddCell(linkCell);
+                    }
+                    else
+                    {
+                        // If the supporting document is not a valid URL, just display the name or message
+                        table.AddCell(supportingDocLink ?? "No document");
+                    }
+
+                    table.AddCell(formattedAmount);
+                    table.AddCell(claim.Status);
+                    table.AddCell(claim.AdditionalNotes);
+                }
+
+                // Add the table to the document
+                document.Add(table);
+                document.Close();
+            }
+
+            // Notify that the report has been generated
+            System.Diagnostics.Debug.WriteLine($"Report generated at: {filePath}");
+        }
+        [HttpGet]
+public IActionResult GenerateReport()
+{
+    // Check if the user has permission
+    var roleCheck = CheckUserRole(new[] { "Coordinator", "Manager" });
+    if (roleCheck != null) return roleCheck;
+
+    // Map the claims into the correct model (Claim)
+    var claimList = _claims.Select(c => new Claim(
+               c.ClaimID,                // Pass the ClaimID
+               c.LecturerName,           // LecturerName
+               c.TotalAmount,            // TotalAmount
+               c.HourlyRate,             // HourlyRate
+               c.HoursWorked,            // HoursWorked (if applicable)
+               c.SubmissionDate,         // SubmissionDate
+               c.SupportingDocumentName, // SupportingDocument (Name)
+               c.Status,                 // Status
+               c.AdditionalNotes         // AdditionalNotes
+    )).ToList();
+
+    // Generate the report with the mapped claims
+    GenerateClaimReport(claimList);
+
+    // Notify user or redirect after generation
+    TempData["SuccessMessage"] = "Claim report generated successfully.";
+    return RedirectToAction("CoordinatorDashboard");
+}
+
+        [HttpGet]
+        public IActionResult DownloadReport()
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Reports", "ApprovedClaimsReport.pdf");
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("The report file does not exist.");
+            }
+
+            // Return the file as a downloadable file
+            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            return File(fileBytes, "application/pdf", "ApprovedClaimsReport.pdf");
+        }
+
+
+
     }
 }

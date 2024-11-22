@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http; 
-using System;
+﻿using Contract_Claim_System.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace Contract_Claim_System.ViewModels
@@ -20,19 +19,22 @@ namespace Contract_Claim_System.ViewModels
         public int HoursWorked { get; set; }
 
         [Required(ErrorMessage = "Submission Date is required.")]
-        public DateTime SubmissionDate { get; set; } = DateTime.Now; 
+        [PastDateValidation(ErrorMessage = "Submission Date cannot be in the future.")]
+        public DateTime SubmissionDate { get; set; } = DateTime.Now;
 
         [Required(ErrorMessage = "Supporting Document is required.")]
         public IFormFile SupportingDocument { get; set; }
 
         public string SupportingDocumentPath { get; set; } = string.Empty;
 
-        public string SupportingDocumentName { get; set; } = string.Empty; 
+        public string SupportingDocumentName { get; set; } = string.Empty;
 
         public string AdditionalNotes { get; set; } = string.Empty;
 
         public decimal TotalAmount { get; set; }
 
         public string Status { get; set; } = "Pending";
+
+        public string RejectionReason { get; set; } = string.Empty;
     }
 }
